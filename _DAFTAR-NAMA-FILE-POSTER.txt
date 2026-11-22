@@ -1,0 +1,72 @@
+DAFTAR NAMA FILE POSTER ANIME
+Simpan poster di folder ini (images/anime/) dengan nama persis seperti di kolom kiri.
+Ekstensi boleh .jpg, .jpeg, .png, atau .webp (huruf kecil semua). Rasio ideal 2:3 (potret).
+Poster yang belum ada tidak apa-apa: kartunya tampil kosong dengan inisial judul.
+
+NAMA FILE (tanpa ekstensi)                JUDUL
+--------------------------------------------------------------------------------
+01. jujutsu-kaisen                        Jujutsu Kaisen
+02. fire-force                            Fire Force
+03. my-hero-academia                      My Hero Academia
+04. black-clover                          Black Clover
+05. chainsaw-man                          Chainsaw Man
+06. demon-slayer                          Demon Slayer
+07. solo-leveling                         Solo Leveling
+08. attack-on-titan                       Attack on Titan
+09. mashle                                Mashle
+10. kaiju-no-8                            Kaiju No. 8
+11. jigokuraku                            Jigokuraku
+12. ao-no-exorcist                        Ao no Exorcist
+13. gachiakuta                            Gachiakuta
+14. dandadan                              Dandadan
+15. tokyo-ghoul                           Tokyo Ghoul
+16. naruto                                Naruto
+17. bleach                                Bleach
+18. the-god-of-high-school                The God of High School
+19. one-piece                             One Piece
+20. vigilante                             Vigilante (M.H.A)
+21. black-torch                           Black Torch
+22. yomi-no-tsugai                        Yomi no Tsugai
+23. tougen-anki                           Tougen Anki
+24. yozakura-san                          Yozakura-san
+25. reincarnation-no-kaben                Reincarnation no Kaben
+26. ninja-kamui                           Ninja Kamui
+27. wind-breaker                          Wind Breaker
+28. kengan-ashura                         Kengan Ashura
+29. vinland-saga                          Vinland Saga
+30. the-millionaire-detective             The Millionaire Detective
+31. sakamoto-days                         Sakamoto Days
+32. spy-x-family                          Spy x Family
+33. dr-stone                              Dr. Stone
+34. shangri-la-frontier                   Shangri-La Frontier
+35. record-of-ragnarok                    Record of Ragnarok
+36. yuusha-party-kiyoubinbou              Yuusha Party wo Oidasareta Kiyoubinbou
+37. boushoku-no-berserk                   Boushoku no Berserk
+38. shinmai-ossan-boukensha               Shinmai Ossan Boukensha
+39. maou-no-ore-dorei-elf                 Maou no Ore ga Dorei Elf wo Yome ni Shitanda ga
+40. tongari-boushi-no-atelier             Tongari Boushi no Atelier
+41. himekishi-wa-barbaroi-no-yome         Himekishi wa Barbaroi no Yome
+42. wistoria                              Tsue to Tsurugi no Wistoria
+43. rokudenashi-majutsu-koushi            Rokudenashi Majutsu Koushi to Akashic Records
+44. ore-wa-subete-wo-parry-suru           Ore wa Subete wo Parry Suru
+45. lv2-kara-cheat                        Lv2 kara Cheat datta Moto Yuusha Kouho
+46. silent-witch                          Silent Witch
+47. skeleton-knight                       Skeleton Knight
+48. kage-no-jitsuryokusha                 Kage no Jitsuryokusha ni Naritakute
+49. tensai-kizoku-isekai-boukenroku       Tensai Kizoku no Isekai Boukenroku
+50. tensai-shitara-dainana-ouji           Tensai Shitara Dainana Ouji Datta node
+51. hanaori-san                           Hanaori-san wa Tensei Shitemo Kenka ga Shitai
+52. tondemo-skill-isekai-hourou-meshi     Tondemo Skill de Isekai Hourou Meshi
+53. kusunoki-tei                          Kami no Niwatsuki Kusunoki-tei
+54. neko-to-ryuu                          Neko to Ryuu
+55. horimiya                              Horimiya
+56. kimi-no-na-wa                         Kimi no Na wa
+57. tenki-no-ko                           Tenki no Ko
+58. suzume                                Suzume
+59. giji-harem                            Giji Harem
+60. tomo-chan                             Tomo-chan wa Onnanoko!
+61. yowayowa-sensei                       Yowayowa Sensei
+62. senpai-ga-uzai                        Senpai ga Uzai Kouhai no Hanashi
+63. kono-bijutsubu                        Kono Bijutsubu ni wa Mondai ga Aru!
+64. yani-neko                             Yani Neko
+65. 100-meter                             100 Meter

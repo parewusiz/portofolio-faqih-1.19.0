@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>My Portfolio</title>
+  
+  <!-- tema & flag JS dipasang sebelum render supaya tidak berkedip -->
+  <script>
+    (function () {
+      var root = document.documentElement;
+      root.classList.add("js");
+      // Selalu mulai MODE PAGI (terang). Easter egg (Langit, Cuaca) tidak permanen: tiap muat ulang kembali ke awal.
+      var theme = "light";
+      try {   // bersihkan sisa simpanan dari versi sebelumnya
+        ["theme", "skyDuo", "skyEgg", "weatherUnlocked", "weatherMode"].forEach(function (k) {
+          localStorage.removeItem(k);
+          document.cookie = k + "=; max-age=0; path=/";
+        });
+      } catch (e) {}
+      root.setAttribute("data-theme", theme);
+    })();
+  </script>
+
+
+  <link rel="stylesheet" href="style.css">
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap&family=Dela+Gothic+One" rel="stylesheet">
+</head>
+
+<body class="is-loading">
+  
+  <!-- LOADING SCREEN: monogram digambar + cincin progres, lalu tirai terbelah -->
+  <div id="loader" class="loader" role="status" aria-live="polite" aria-label="Memuat website">
+    <div class="ld-panel ld-top" aria-hidden="true"></div>
+    <div class="ld-panel ld-bot" aria-hidden="true"></div>
+
+    <div class="ld-center">
+      <div class="ld-mark" aria-hidden="true">
+        <svg viewBox="0 0 200 200" width="200" height="200">
+          <defs>
+            <linearGradient id="ldGrad" x1="0" y1="0" x2="1" y2="1">
+              <stop offset="0" stop-color="#4f9dff"/><stop offset=".55" stop-color="#7ae6ff"/><stop offset="1" stop-color="#9b7bff"/>
+            </linearGradient>
+          </defs>
+          <circle class="ld-ring-bg" cx="100" cy="100" r="92"/>
+          <circle class="ld-ring" cx="100" cy="100" r="92" pathLength="100"/>
+          <g class="ld-letters" transform="translate(48 58)">
+            <path class="ld-stroke l1" pathLength="1" d="M0 84 L24 0 L48 84 M9 56 H39"/>
+            <path class="ld-stroke l2" pathLength="1" d="M66 84 V0 H98 M66 38 H92"/>
+          </g>
+        </svg>
+      </div>
+      <p class="ld-name">Andi Ahmad Faqih</p>
+      <p class="ld-role">Desain Komunikasi Visual</p>
+    </div>
+
+    <div class="ld-foot" aria-hidden="true">
+      <span class="ld-status" id="loaderStatus">Menyiapkan ruang…</span>
+      <span class="ld-pct" id="loaderPercent">0%</span>
+    </div>
+  </div>
+
+  <!-- BACKGROUND: langit luar angkasa (gelap) / langit cerah (terang) -->
+  <div class="background-pattern" aria-hidden="true">
+    <canvas id="spaceCanvas"></canvas>
+    <div class="sky-light">
+      <span class="sun-glow"></span>
+      <span class="cloud cloud-1"></span>
+      <span class="cloud cloud-2"></span>
+      <span class="cloud cloud-3"></span>
+    </div>
+  </div>
+  
+  <!-- NAVIGATION -->
+  <nav class="navbar">
+    <div class="nav-menu">
+      <span class="nav-hover"></span><span class="nav-pill"></span>
+      <a href="#home" class="nav-link active">Home</a>
+      <a href="#about" class="nav-link">About</a>
+      <a href="#portfolio" class="nav-link">Portfolio</a>
+      <a href="#contact" class="nav-link">Contact</a>
+    </div>
+    
+    <div class="nav-mascot" aria-hidden="true"><i></i><i></i><b></b></div>
+  </nav>
+
+
+  <!-- DARK / LIGHT MODE -->
+  <button class="theme-toggle" id="themeToggle" type="button" role="switch" aria-checked="false" aria-label="Ganti ke mode terang">
+    <span class="tt-track">
+      <span class="tt-stars"><i></i><i></i><i></i></span>
+      <span class="tt-cloud"></span>
+      <span class="tt-knob">
+        <span class="tt-crater c1"></span>
+        <span class="tt-crater c2"></span>
+        <span class="tt-rays"></span>
+      </span>
+    </span>
+  </button>
+  
+
+  <!-- MUSIK (kiri bawah): klik = lagu on/off · tahan / klik kanan = daftar lagu -->
+  <div class="music-player" id="musicPlayer">
+    <div class="music-menu" id="musicMenu" role="menu" aria-label="Daftar lagu">
+      <p class="music-menu-title">Pilih Lagu</p>
+      <ul class="music-list" id="musicList"></ul>
+    </div>
+
+    <button class="music-toggle" id="musicToggle" type="button" aria-pressed="false" aria-haspopup="menu" aria-expanded="false"
+            aria-label="Putar lagu. Tahan untuk memilih lagu.">
+      <span class="mt-track">
+        <span class="mt-bars"><i></i><i></i><i></i><i></i></span>
+        <span class="mt-knob"><span class="mt-disc"><span class="mt-label"></span></span></span>
+      </span>
+    </button>
+
+    <span class="music-tip" id="musicTip">Klik: putar lagu · Tahan: pilih lagu</span>
+  </div>
+
+  <!-- RAHASIA (kanan bawah): muncul setelah kode rahasia, disimpan permanen -->
+  <div class="bleach-secret" id="bleachSecret" hidden>
+    <div class="bleach-menu" id="bleachMenu" role="menu" aria-label="Menu Bleach">
+      <p class="bleach-menu-title"><span>BLEACH</span><small>ブリーチ</small></p>
+      <ul class="bleach-list">
+        <li><button type="button" role="menuitem" id="bleachShinji" data-pick="shinji">
+          <span class="bl-num">1</span>
+          <span class="bl-name">Shinji Hirako<small>平子 真子</small></span>
+          <span class="bl-state" id="bleachShinjiState">Panggil</span>
+        </button></li>
+        <li><button type="button" role="menuitem" id="bleachAizen" data-pick="aizen">
+          <span class="bl-num">2</span>
+          <span class="bl-name">Sōsuke Aizen<small>藍染 惣右介</small></span>
+          <span class="bl-state" id="bleachAizenState">Panggil</span>
+        </button></li>
+        <li><button type="button" role="menuitem" id="bleachZaraki" data-pick="zaraki">
+          <span class="bl-num">3</span>
+          <span class="bl-name">Kenpachi Zaraki<small>更木 剣八</small></span>
+          <span class="bl-state" id="bleachZarakiState">Panggil</span>
+        </button></li>
+        <li><button type="button" role="menuitem" id="bleachIchigo" data-pick="ichigo">
+          <span class="bl-num">4</span>
+          <span class="bl-name">Ichigo Kurosaki<small>黒崎 一護</small></span>
+          <span class="bl-state" id="bleachIchigoState">Panggil</span>
+        </button></li>
+      </ul>
+    </div>
+
+    <button class="bleach-toggle" id="bleachToggle" type="button" aria-haspopup="menu" aria-expanded="false" aria-label="Buka menu Bleach">
+      <span class="bl-track">
+        <span class="bl-slash"></span>
+        <span class="bl-word">BLEACH</span>
+        <span class="bl-knob"><i></i><i></i><b></b></span>
+      </span>
+    </button>
+  </div>
+
+  <!-- HOME / HERO SECTION -->
+  <section id="home" class="home-section">
+    <div class="home-orbit home-orbit-one" aria-hidden="true"></div>
+    <div class="home-orbit home-orbit-two" aria-hidden="true"></div>
+
+    <div class="home-content">
+      <p class="home-eyebrow"><span class="status-dot"></span> WELCOME TO MY DIGITAL SPACE</p>
+      <p class="home-greeting">Halo, saya</p>
+      <h1 class="home-name">Andi Ahmad<br><span>Faqih Parewusi.</span></h1>
+      <p class="home-description">
+        Pelajar Desain Komunikasi Visual di SMKN 1 Wajo yang tertarik pada
+        teknologi, kreativitas, dan pengembangan digital. Saya senang mengubah
+        ide menjadi karya yang punya tujuan dan pengalaman yang berkesan.
+      </p>
+
+      <div class="home-actions">
+        <a href="#portfolio" class="home-button home-button-primary">
+          Jelajahi Portofolio <span aria-hidden="true">↗</span>
+        </a>
+        <a href="#about" class="home-button home-button-secondary">
+          Kenali Saya <span aria-hidden="true">↓</span>
+        </a>
+      </div>
+
+      <div class="home-meta">
+        <span>DESAIN KOMUNIKASI VISUAL</span>
+        <span class="home-meta-line"></span>
+        <span>SMKN 1 WAJO</span>
+      </div>
+    </div>
+
+    <!-- ID CARD + TALI (tarik, lepas, klik untuk membalik) -->
+    <div class="idcard-zone" id="idcardZone">
+      <canvas class="lanyard-canvas" id="lanyardCanvas" aria-hidden="true"></canvas>
+
+      <div class="idcard" id="idcard" role="button" tabindex="0" aria-pressed="false"
+           aria-label="ID card. Klik untuk membalik, tarik untuk menggerakkan.">
+        <span class="idcard-clip" aria-hidden="true"></span>
+        <div class="idcard-inner">
+
+          <!-- DEPAN: ganti src di <img> bawah ini dengan fotomu (contoh: images/idcard-front.png) -->
+          <div class="idcard-face idcard-front">
+            <div class="idcard-fallback">
+              <span class="idc-slot"></span>
+              <div class="idc-photo">AF</div>
+              <strong class="idc-name">Andi Ahmad<br>Faqih Parewusi</strong>
+              <span class="idc-role">Desain Komunikasi Visual</span>
+              <span class="idc-school">SMKN 1 Wajo</span>
+            </div>
+            <img class="idcard-art" src="images/idcard-front.png" alt="" draggable="false" onload="this.parentNode.classList.add('has-art')" onerror="this.remove()">
+          </div>
+
+          <!-- BELAKANG: ganti src di <img> bawah ini dengan fotomu (contoh: images/idcard-back.png) -->
+          <div class="idcard-face idcard-back">
+            <div class="idcard-fallback idcard-fallback-back">
+              <span class="idc-slot"></span>
+              <div class="idc-qr"></div>
+              <p class="idc-back-text">Let's create<br>something amazing.</p>
+            </div>
+            <img class="idcard-art" src="images/idcard-back.png" alt="" draggable="false" onload="this.parentNode.classList.add('has-art')" onerror="this.remove()">
+          </div>
+
+        </div>
+      </div>
+
+      <p class="idcard-hint" id="idcardHint">Klik untuk membalik · tarik talinya</p>
+    </div>
+
+
+    <a class="home-scroll-cue" href="#about" aria-label="Scroll ke About">
+      <span>SCROLL TO EXPLORE</span>
+      <span class="scroll-cue-line"></span>
+    </a>
+  </section>
+
+  <!-- ABOUT SECTION -->
+  <section id="about" class="about-section">
+    
+    <h1 class="section-title">About Me</h1>
+    
+
+<!-- ABOUT: nama kiri · foto tengah (tanpa bingkai) · deskripsi kanan -->
+    <div class="introduction about-hero">
+
+      <div class="about-left">
+        <h2 class="hello">Hi, I'm</h2>
+
+        <h1 class="my-name">
+          Andi Ahmad Faqih Parewusi
+        </h1>
+
+        <a href="#" class="main-button">
+          ▤ View CV
+        </a>
+      </div>
+
+      <!-- PROFILE PHOTO: p.png = foto utama, pv.png = foto kedua saat kursor mendekat -->
+      <div class="profile-container">
+        <button
+          class="profile-placeholder"
+          id="profilePhoto"
+          type="button"
+          aria-label="Ganti foto profil"
+          aria-pressed="false"
+        >
+          <img class="profile-image profile-image-main" src="images/p.png" alt="Foto profil" draggable="false">
+          <img class="profile-image profile-image-alt" src="images/pv.png" alt="" aria-hidden="true" draggable="false">
+        </button>
+      </div>
+
+      <div class="about-right">
+        <p class="description">
+          Saya adalah seseorang yang memiliki ketertarikan
+          dalam dunia teknologi, kreativitas, dan pengembangan
+          digital. Saya senang mempelajari hal baru dan
+          menciptakan sesuatu yang bermanfaat.
+        </p>
+
+        <a href="#portfolio" class="main-button">
+          ‹ › View Projects
+        </a>
+      </div>
+
+    </div>
+
+    <!-- BIODATA: tempat & tanggal lahir (isi di script.js → BIODATA) -->
+    <section class="bio" id="bio" aria-label="Tempat dan tanggal lahir">
+      <div class="bio-date" aria-hidden="true">
+        <span class="bio-month" id="bioMonth">—</span>
+        <b class="bio-day" id="bioDay">00</b>
+        <span class="bio-year" id="bioYear">0000</span>
+      </div>
+
+      <div class="bio-main">
+        <p class="bio-eyebrow"><span></span>BIODATA</p>
+        <h3 class="bio-title">Tempat &amp; Tanggal Lahir</h3>
+        <p class="bio-place">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.2A7 7 0 0 1 19 9.8C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.8" r="2.4"/></svg>
+          <span id="bioPlace">—</span><i aria-hidden="true">·</i><time id="bioFull">—</time>
+        </p>
+
+        <div class="bio-stats">
+          <div class="bio-stat"><small>Usia</small><b id="bioAge">—</b></div>
+          <div class="bio-stat"><small>Hari lahir</small><b id="bioWeekday">—</b></div>
+          <div class="bio-stat"><small>Zodiak</small><b id="bioZodiac">—</b></div>
+          <div class="bio-stat bio-next"><small>Ulang tahun berikutnya</small><b id="bioNext">—</b></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- EDUCATION AND EXPERIENCE (diisi dari script.js) -->
+    <div class="timeline-container" id="timeline"></div>
+
+    <!-- ANIME / WIBU: panel yang bisa dibuka (data di anime-data.js, logika di script.js) -->
+    <div class="wibu" id="wibu">
+      <button class="wibu-head" id="wibuHead" type="button" aria-expanded="false" aria-controls="wibuBody">
+        <span class="wibu-kanji" aria-hidden="true">アニメ</span>
+        <span class="wibu-title"><b>Aku Wibu</b><small id="wibuCount">Koleksi tontonanku</small></span>
+        <span class="wibu-arrow" aria-hidden="true"></span>
+      </button>
+      <div class="wibu-body" id="wibuBody">
+        <div class="wibu-inner">
+          <p class="wibu-intro">Pilih satu atau beberapa genre. Yang tampil hanya anime yang punya <b>semua</b> genre terpilih. Klik poster untuk melihat sinopsis.</p>
+          <div class="wibu-filters" id="wibuFilters" role="group" aria-label="Filter genre"></div>
+          <p class="wibu-status" id="wibuStatus" aria-live="polite"></p>
+          <div class="wibu-grid" id="wibuGrid"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- FOLDER COLLECTION (diisi dari script.js) -->
+    <div class="folder-container" id="folders" aria-label="Koleksi portofolio"></div>
+  </section>
+
+  <!-- PORTFOLIO SCROLL-ZOOM TRANSITION -->
+  <section id="portfolio" class="portfolio-transition" aria-label="Portfolio transition">
+    <div class="portfolio-sticky">
+      <h1 class="portfolio-big-text">PORTFOLIO</h1>
+      <div class="portfolio-white-wipe" aria-hidden="true"></div>
+      <p class="portfolio-scroll-hint">KEEP SCROLLING</p>
+    </div>
+  </section>
+
+  <!-- WHITE PORTFOLIO CONTENT -->
+  <section id="portfolio-content" class="portfolio-white">
+    <h1>Portofolio</h1>
+    <div class="portfolio-tabs" role="tablist" aria-label="Kategori portofolio">
+      <button class="tab active" type="button" data-tab="Projects">Projects</button>
+      <button class="tab" type="button" data-tab="Certificates">Certificates</button>
+      <button class="tab" type="button" data-tab="Awards">Awards</button>
+    </div>
+    <div class="portfolio-carousel">
+      <button type="button" class="carousel-btn prev" aria-label="Sebelumnya"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+      <div class="portfolio-content" aria-live="polite"></div>
+      <button type="button" class="carousel-btn next" aria-label="Berikutnya"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+    </div>
+  </section>
+
+  <!-- PHOTO SCATTER (transisi Portfolio → Contact) -->
+  <section id="scatter" class="scatter-section" aria-hidden="true">
+    <div class="scatter-sticky">
+      <div class="scatter-photos"></div>
+      <h2 class="scatter-title">Let’s create <span>something amazing.</span></h2>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact" class="contact-section">
+    <h2 class="contact-title">Hubungi Saya</h2>
+    <div class="contact-grid">
+      <div class="contact-col">
+        <form class="contact-card" id="contact-form">
+          <h3 class="card-title accent">Hubungi</h3>
+          <p class="card-sub">Ada yang mau didiskusikan? Langsung kirim pesan aja ya!</p>
+          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="field"><label for="c-nama">Nama</label><input id="c-nama" name="nama" type="text" placeholder="Nama Anda" required></div>
+          <div class="field"><label for="c-email">Email</label><input id="c-email" name="email" type="email" placeholder="Email Anda" required></div>
+          <div class="field"><label for="c-pesan">Pesan</label><textarea id="c-pesan" name="pesan" rows="5" placeholder="Pesan Anda" required></textarea></div>
+          <button class="send-btn" type="submit">➤ Kirim Pesan</button>
+          <p class="form-status" aria-live="polite"></p>
+        </form>
+        <div class="contact-card">
+          <h3 class="card-title">Find Me</h3>
+          <ul class="social-list" id="socials"></ul>
+          <img class="find-photo" src="p.png" alt="Foto Andi Ahmad Faqih Parewusi" onerror="this.remove()">
+        </div>
+      </div>
+      <div class="contact-col">
+        <form class="contact-card" id="comment-form">
+          <h3 class="card-title"><span class="card-ico">✎</span> Tulis Komentar</h3>
+          <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+          <div class="field"><label for="k-nama">Nama</label><input id="k-nama" name="nama" type="text" placeholder="Masukkan nama kamu" required></div>
+          <div class="field"><label for="k-pesan">Komentar</label><textarea id="k-pesan" name="pesan" rows="4" placeholder="Tulis komentar kamu di sini..." required></textarea></div>
+          <button class="send-btn" type="submit">➤ Kirim Komentar</button>
+          <p class="form-status" aria-live="polite"></p>
+        </form>
+        <div class="contact-card">
+          <h3 class="card-title"><span class="card-ico">✎</span> Komentar <span class="accent" id="comment-count"></span></h3>
+          <ul class="comment-list" id="comment-list"></ul>
+        </div>
+      </div>
+    </div>
+  </section>
+  
+  <!-- MINI GAME: tombol kanan bawah + pusat game (logika di games.js) -->
+  <button class="game-launcher" id="gameLauncher" type="button" aria-haspopup="dialog" aria-label="Buka mini game">
+    <svg class="gl-ico" viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 11h4M8 9v4"/><circle cx="15.5" cy="10.5" r=".6" fill="currentColor"/><circle cx="17.5" cy="12.5" r=".6" fill="currentColor"/><path d="M7.2 6h9.6a4 4 0 0 1 3.9 3.1l1 4.6a3 3 0 0 1-5.2 2.5L15 14.5H9l-1.5 1.7a3 3 0 0 1-5.2-2.5l1-4.6A4 4 0 0 1 7.2 6z"/></svg>
+    <span class="gl-text">Game</span>
+  </button>
+
+  <div class="game-hub" id="gameHub" role="dialog" aria-modal="true" aria-label="Mini game" hidden>
+    <div class="gh-backdrop" data-gclose></div>
+    <div class="gh-panel" id="ghPanel">
+      <button class="gh-close" type="button" data-gclose aria-label="Tutup">&times;</button>
+      <div class="gh-menu" id="ghMenu">
+        <p class="gh-eyebrow">MINI GAME</p>
+        <h2 class="gh-title">Mau main apa?</h2>
+        <div class="gh-cards">
+          <button class="gh-card" type="button" data-game="tebak">
+            <span class="gh-art gh-art-tebak" aria-hidden="true">?</span>
+            <b>Tebak Anime</b>
+            <small>10 soal dari koleksi animeku. Mulai dari genre, buka petunjuk kalau buntu.</small>
+          </button>
+          <button class="gh-card" type="button" data-game="alien">
+            <span class="gh-art gh-art-alien" aria-hidden="true">
+              <svg viewBox="0 0 120 70" width="120" height="70"><ellipse cx="60" cy="40" rx="48" ry="13" fill="#7c8fd0"/><path d="M36 38a24 22 0 0 1 48 0z" fill="rgba(170,240,255,.7)"/><ellipse cx="60" cy="28" rx="7" ry="9" fill="#8aff9b"/><circle cx="30" cy="44" r="3" fill="#fff3a8"/><circle cx="60" cy="48" r="3" fill="#ff9fcb"/><circle cx="90" cy="44" r="3" fill="#fff3a8"/></svg>
+            </span>
+            <b>Langit Tenang</b>
+            <small>Alien turun dari langit di bawah siang, sore, dan malam. Tebas dengan katana atau tembak dengan senapan. Pilih Mudah (5 ronde), Normal (10), atau Sulit (15), dengan pos di setiap 5 ronde dan banyak jenis alien baru.</small>
+          </button>
+        </div>
+      </div>
+      <div class="gh-screen" id="ghScreen" hidden></div>
+    </div>
+  </div>
+
+  <!-- NOTIFIKASI easter egg: ucapan selamat + tombol, berbunyi "ting" saat muncul -->
+  <div class="egg-toast" id="eggToast" role="alertdialog" aria-live="assertive" aria-labelledby="eggTitle" hidden>
+    <span class="egg-icon" aria-hidden="true">卍</span>
+    <div class="egg-body">
+      <p class="egg-kicker">EASTER EGG DITEMUKAN!</p>
+      <p class="egg-title" id="eggTitle">Selamat anda menemukan easter egg Bleach 🎉</p>
+      <p class="egg-sub">Panggil Shinji, Aizen, Zaraki, dan Ichigo lewat menu Bleach. Kekuatan Shinji, Aizen, Zaraki, dan Ichigo (Bankai · Hollow · Chain) juga tersedia di Serang Alien.</p>
+    </div>
+    <button class="egg-x" id="eggX" type="button" aria-label="Tutup">&times;</button>
+    <span class="egg-bar" aria-hidden="true"></span>
+  </div>
+
+  <!-- PANGGUNG SHINJI (foto/gif + audio saat Bankai & Sekai) -->
+  <div class="bleach-stage" id="bleachStage" aria-hidden="true" hidden>
+    <div class="bs-bg"><span class="bs-ring"></span><span class="bs-saka">逆</span></div>
+    <div class="bs-photo" id="bsPhoto">
+      <div class="bs-fallback" aria-hidden="true"><b>平子</b><b>真子</b></div>
+    </div>
+    <div class="bs-text">
+      <p class="bs-kanji" id="bsKanji">卍解</p>
+      <h2 class="bs-title" id="bsTitle">Hirako Shinji</h2>
+      <p class="bs-sub" id="bsSub">Visored · Kapten Divisi 5</p>
+    </div>
+    <button class="bs-skip" id="bsSkip" type="button">Lewati</button>
+  </div>
+
+  <!-- JENDELA ANIME (poster + sinopsis) -->
+  <div class="wibu-modal" id="wibuModal" role="dialog" aria-modal="true" aria-labelledby="wibuModalTitle" hidden>
+    <div class="wibu-backdrop" data-close></div>
+    <div class="wibu-dialog">
+      <button class="wibu-close" type="button" data-close aria-label="Tutup">&times;</button>
+      <div class="wibu-poster" id="wibuModalPoster"></div>
+      <div class="wibu-info">
+        <p class="wibu-info-no" id="wibuModalNo"></p>
+        <h3 id="wibuModalTitle"></h3>
+        <div class="wibu-tags" id="wibuModalTags"></div>
+        <p class="wibu-syn" id="wibuModalSyn"></p>
+      </div>
+    </div>
+  </div>
+
+  <script src="anime-data.js"></script>
+  <script src="script.js"></script>
+  <script src="games.js"></script>
+  
+</body>
+
+</html>
